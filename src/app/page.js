@@ -43,6 +43,7 @@ export default function Home() {
       <ResultsPanel
         isOpen={isPanelOpen}
         location={selectedLocation}
+        onClose={() => setIsPanelOpen(false)}
       />
     </main>
   );

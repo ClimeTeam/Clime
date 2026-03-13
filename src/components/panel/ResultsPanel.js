@@ -1,5 +1,7 @@
 'use client';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+
 const MOCK_RESULT = {
   location: {
     name: 'Victoria Island',
@@ -89,12 +91,26 @@ function RiskCard({ type, data }) {
   );
 }
 
-export default function ResultsPanel({ isOpen, location }) {
+export default function ResultsPanel({ isOpen, location, onClose }) {
   const result = MOCK_RESULT;
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
-  return (
-    <div
-      style={{
+  const panelStyles = isMobile
+    ? {
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '70%',
+        backgroundColor: 'white',
+        boxShadow: '0 -4px 24px rgba(0,0,0,0.1)',
+        transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'transform 0.3s ease-in-out',
+        zIndex: 1000,
+        overflowY: 'auto',
+        borderRadius: '16px 16px 0 0',
+      }
+    : {
         position: 'fixed',
         top: 0,
         right: 0,
@@ -106,18 +122,40 @@ export default function ResultsPanel({ isOpen, location }) {
         transition: 'transform 0.3s ease-in-out',
         zIndex: 1000,
         overflowY: 'auto',
-      }}
-    >
+      };
+
+  return (
+    <div style={panelStyles}>
+
+      {/* Drag handle — only visible on mobile */}
+      {isMobile && (
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 bg-gray-200 rounded-full" />
+        </div>
+      )}
+
       <div style={{ padding: '24px' }}>
 
-        {/* Location name — uses real selected location name if available */}
+        {/* Header row — location name and close button */}
         <div style={{ marginBottom: '24px' }}>
-          <h2 className="text-2xl font-bold text-brand-dark">
-            {location?.name || result.location.name}
-          </h2>
-          <p className="text-sm text-brand-gray mt-1">
-  {location?.subtext || result.location.subtext}
-</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-brand-dark">
+                {location?.name || result.location.name}
+              </h2>
+              <p className="text-sm text-brand-gray mt-1">
+                {location?.subtext || result.location.subtext}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="mt-1 p-1.5 rounded-lg hover:bg-brand-light transition-colors flex-shrink-0"
+            >
+              <svg className="w-5 h-5 text-brand-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Risk cards */}
