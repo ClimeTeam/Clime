@@ -74,7 +74,7 @@ function RiskCard({ type, data }) {
           <span className={config.iconClass}>
             {RISK_ICONS[type]}
           </span>
-          <span className="text-sm font-medium text-brand-dark">
+          <span className="text-sm font-medium text-slate-800">
             {RISK_LABELS[type]}
           </span>
         </div>
@@ -83,7 +83,7 @@ function RiskCard({ type, data }) {
         </span>
       </div>
       {data.peak_season && (
-        <p className="text-xs text-brand-gray mt-2 ml-8">
+        <p className="text-xs text-slate-500 mt-2 ml-8">
           Peak intensity: {data.peak_season}
         </p>
       )}
@@ -109,6 +109,7 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
         zIndex: 1000,
         overflowY: 'auto',
         borderRadius: '16px 16px 0 0',
+        overflow: 'hidden',
       }
     : {
         position: 'fixed',
@@ -122,45 +123,48 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
         transition: 'transform 0.3s ease-in-out',
         zIndex: 1000,
         overflowY: 'auto',
+        overflow: 'hidden',
       };
 
   return (
     <div style={panelStyles}>
 
-      {/* Drag handle — only visible on mobile */}
+      {/* Mobile drag handle */}
       {isMobile && (
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-gray-200 rounded-full" />
+        <div className="flex justify-center pt-3 pb-1" style={{ backgroundColor: '#1C3A4A' }}>
+          <div className="w-10 h-1 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }} />
         </div>
       )}
 
-      <div style={{ padding: '24px' }}>
-
-        {/* Header row — location name and close button */}
-        <div style={{ marginBottom: '24px' }}>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-brand-dark">
-                {location?.name || result.location.name}
-              </h2>
-              <p className="text-sm text-brand-gray mt-1">
-                {location?.subtext || result.location.subtext}
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="mt-1 p-1.5 rounded-lg hover:bg-brand-light transition-colors flex-shrink-0"
-            >
-              <svg className="w-5 h-5 text-brand-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+      {/* Dark teal header */}
+      <div style={{ backgroundColor: '#1C3A4A', padding: '24px' }}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold" style={{ color: '#ffffff' }}>
+              {location?.name || result.location.name}
+            </h2>
+            <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
+              {location?.subtext || result.location.subtext}
+            </p>
           </div>
+          <button
+            onClick={onClose}
+            className="mt-1 p-1.5 rounded-lg transition-colors flex-shrink-0"
+            // style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+          >
+            <svg className="w-5 h-5" style={{ color: '#ffffff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
+      </div>
+
+      {/* White body */}
+      <div style={{ padding: '24px', overflowY: 'auto' }}>
 
         {/* Risk cards */}
         <div style={{ marginBottom: '24px' }}>
-          <p className="text-xs font-semibold text-brand-gray uppercase tracking-widest mb-3">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#0D9488' }}>
             Risk Assessment
           </p>
           <div className="flex flex-col gap-3">
@@ -172,16 +176,16 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
 
         {/* AI explanation */}
         <div style={{ marginBottom: '24px' }}>
-          <p className="text-xs font-semibold text-brand-gray uppercase tracking-widest mb-3">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#0D9488' }}>
             Climate Insight
           </p>
-          <p className="text-sm text-brand-dark leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed">
             {result.explanation}
           </p>
         </div>
 
         {/* Attribution */}
-        <p className="text-xs text-brand-gray border-t border-gray-100 pt-4">
+        <p className="text-xs text-slate-400 border-t border-gray-100 pt-4">
           Data sourced from NASA SRTM, NASA POWER, and USGS Landsat.
         </p>
 
