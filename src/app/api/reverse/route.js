@@ -20,17 +20,18 @@ export async function GET(request) {
       return Response.json({ name: 'Unknown Location' });
     }
 
-    // Extract the most useful name from the result
+    const props = feature.properties;
+
     const name =
-      feature.properties.name ||
-      feature.properties.street ||
-      feature.properties.district ||
+      props.name ||
+      props.street ||
+      props.district ||
       'Unknown Location';
 
+    // county is the LGA in Lagos, state is "Lagos State"
     const subtext = [
-      feature.properties.district,
-      feature.properties.city,
-      feature.properties.state,
+      props.county ? `${props.county} LGA` : null,
+      props.state || 'Lagos',
     ]
       .filter(Boolean)
       .join(', ');

@@ -22,16 +22,18 @@ export default function Home() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const handleLocationSelect = async (coords) => {
-    // If coords already has a name (from search), use it directly
-    // If not (from map click or GPS), reverse geocode to get the name
-    if (!coords.name) {
-      const { name, subtext } = await reverseGeocode(coords.lat, coords.lng);
-      coords = { ...coords, name, subtext };
-    }
+  if (!coords.name || !coords.subtext) {
+    const { name, subtext } = await reverseGeocode(coords.lat, coords.lng);
+    coords = { 
+      ...coords, 
+      name: coords.name || name, 
+      subtext: coords.subtext || subtext 
+    };
+  }
 
-    setSelectedLocation(coords);
-    setIsPanelOpen(true);
-  };
+  setSelectedLocation(coords);
+  setIsPanelOpen(true);
+};
 
   return (
   <main className="w-full h-screen relative">
