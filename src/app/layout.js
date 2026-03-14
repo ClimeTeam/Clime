@@ -9,6 +9,9 @@ const inter = Inter({
 export const metadata = {
   title: "CLIME — Climate Risk Awareness",
   description: "Check climate risk levels for any location in Lagos State. Flood, heat, and rainfall risk scores powered by real environmental data.",
+  icons: {
+    icon: '/clime-favicon.png',
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -6,6 +6,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import GpsButton from '@/components/ui/GpsButton';
 import ResultsPanel from '@/components/panel/ResultsPanel';
 import { reverseGeocode } from '@/services/geocoding';
+import Logo from '@/components/ui/Logo';
 
 const MapView = dynamic(() => import('@/components/map/MapView'), {
   ssr: false,
@@ -33,18 +34,19 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full h-screen relative">
-      <MapView
-        onLocationSelect={handleLocationSelect}
-        selectedLocation={selectedLocation}
-      />
-      <SearchBar onLocationSelect={handleLocationSelect} />
-      <GpsButton onLocationSelect={handleLocationSelect} />
-      <ResultsPanel
-        isOpen={isPanelOpen}
-        location={selectedLocation}
-        onClose={() => setIsPanelOpen(false)}
-      />
-    </main>
-  );
+  <main className="w-full h-screen relative">
+    <MapView
+      onLocationSelect={handleLocationSelect}
+      selectedLocation={selectedLocation}
+    />
+    <Logo />
+    <SearchBar onLocationSelect={handleLocationSelect} />
+    <GpsButton onLocationSelect={handleLocationSelect} />
+    <ResultsPanel
+      isOpen={isPanelOpen}
+      location={selectedLocation}
+      onClose={() => setIsPanelOpen(false)}
+    />
+  </main>
+);
 }
