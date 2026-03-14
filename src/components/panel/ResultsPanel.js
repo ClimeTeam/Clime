@@ -2,20 +2,6 @@
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-const MOCK_RESULT = {
-  location: {
-    name: 'Victoria Island',
-    subtext: 'Eti-Osa LGA, Lagos',
-  },
-  risks: {
-    flood: { score: 'high', peak_season: 'June – September' },
-    heat: { score: 'medium', peak_season: 'February – April' },
-    rainfall: { score: 'low', peak_season: 'May – July' },
-  },
-  explanation:
-    'Victoria Island is highly vulnerable to coastal flooding due to its low elevation and proximity to the Atlantic Ocean. Urban density and limited drainage infrastructure exacerbate risk during peak monsoon seasons.',
-};
-
 const RISK_CONFIG = {
   high: {
     label: 'HIGH',
@@ -91,8 +77,34 @@ function RiskCard({ type, data }) {
   );
 }
 
-export default function ResultsPanel({ isOpen, location, onClose }) {
-  const result = MOCK_RESULT;
+function LoadingSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 animate-pulse">
+      <div className="h-4 bg-slate-100 rounded w-32 mb-2" />
+      <div className="h-20 bg-slate-100 rounded-xl" />
+      <div className="h-20 bg-slate-100 rounded-xl" />
+      <div className="h-20 bg-slate-100 rounded-xl" />
+      <div className="h-4 bg-slate-100 rounded w-32 mt-4 mb-2" />
+      <div className="h-16 bg-slate-100 rounded-xl" />
+    </div>
+  );
+}
+
+function ErrorState({ message }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+        <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <p className="text-sm text-slate-600">{message}</p>
+    </div>
+  );
+}
+
+export default function ResultsPanel({ isOpen, location, riskData, isLoading, error, onClose }) {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const panelStyles = isMobile
@@ -107,9 +119,9 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
         transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
         transition: 'transform 0.3s ease-in-out',
         zIndex: 1000,
+        overflowX: 'hidden',
         overflowY: 'auto',
         borderRadius: '16px 16px 0 0',
-        overflow: 'hidden',
       }
     : {
         position: 'fixed',
@@ -122,14 +134,13 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
         transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
         transition: 'transform 0.3s ease-in-out',
         zIndex: 1000,
-        overflowY: 'auto',
-        overflow: 'hidden',
+        overflowX: 'hidden',
+        overflowY: 'hidden',
       };
 
   return (
     <div style={panelStyles}>
 
-      {/* Mobile drag handle */}
       {isMobile && (
         <div className="flex justify-center pt-3 pb-1" style={{ backgroundColor: '#1C3A4A' }}>
           <div className="w-10 h-1 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }} />
@@ -141,16 +152,16 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold" style={{ color: '#ffffff' }}>
-              {location?.name || result.location.name}
+              {location?.name || 'Loading...'}
             </h2>
             <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>
-              {location?.subtext || result.location.subtext}
+              {location?.subtext || ''}
             </p>
           </div>
           <button
             onClick={onClose}
             className="mt-1 p-1.5 rounded-lg transition-colors flex-shrink-0"
-            // style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+            style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
           >
             <svg className="w-5 h-5" style={{ color: '#ffffff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -159,35 +170,50 @@ export default function ResultsPanel({ isOpen, location, onClose }) {
         </div>
       </div>
 
-      {/* White body */}
-      <div style={{ padding: '24px', overflowY: 'auto' }}>
+      {/* Scrollable body */}
+      <div style={{ padding: '24px', overflowY: 'auto', height: 'calc(100% - 100px)' }}>
 
-        {/* Risk cards */}
-        <div style={{ marginBottom: '24px' }}>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#0D9488' }}>
-            Risk Assessment
-          </p>
-          <div className="flex flex-col gap-3">
-            {Object.entries(result.risks).map(([type, data]) => (
-              <RiskCard key={type} type={type} data={data} />
-            ))}
+        {isLoading && <LoadingSkeleton />}
+
+        {!isLoading && error && <ErrorState message={error} />}
+
+        {!isLoading && !error && riskData && (
+          <>
+            <div style={{ marginBottom: '24px' }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-3"
+                style={{ color: '#0D9488' }}>
+                Risk Assessment
+              </p>
+              <div className="flex flex-col gap-3">
+                {Object.entries(riskData.risks).map(([type, data]) => (
+                  <RiskCard key={type} type={type} data={data} />
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-3"
+                style={{ color: '#0D9488' }}>
+                Climate Insight
+              </p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                {riskData.explanation}
+              </p>
+            </div>
+
+            <p className="text-xs text-slate-400 border-t border-gray-100 pt-4">
+              Data sourced from NASA SRTM, NASA POWER, and USGS Landsat.
+            </p>
+          </>
+        )}
+
+        {!isLoading && !error && !riskData && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-sm text-slate-400">
+              Select a location to see its climate risk profile.
+            </p>
           </div>
-        </div>
-
-        {/* AI explanation */}
-        <div style={{ marginBottom: '24px' }}>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#0D9488' }}>
-            Climate Insight
-          </p>
-          <p className="text-sm text-slate-700 leading-relaxed">
-            {result.explanation}
-          </p>
-        </div>
-
-        {/* Attribution */}
-        <p className="text-xs text-slate-400 border-t border-gray-100 pt-4">
-          Data sourced from NASA SRTM, NASA POWER, and USGS Landsat.
-        </p>
+        )}
 
       </div>
     </div>
