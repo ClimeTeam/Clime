@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 const RISK_CONFIG = {
@@ -77,15 +78,68 @@ function RiskCard({ type, data }) {
   );
 }
 
+const LOADING_MESSAGES = [
+  'Analysing satellite data...',
+  'Checking flood risk models...',
+  'Evaluating heat stress patterns...',
+  'Reviewing rainfall history...',
+  'Crunching climate indicators...',
+  'Almost there...',
+];
+
 function LoadingSkeleton() {
+  const [msgIndex, setMsgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex((i) => (i + 1) % LOADING_MESSAGES.length);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="flex flex-col gap-3 animate-pulse">
-      <div className="h-4 bg-slate-100 rounded w-32 mb-2" />
-      <div className="h-20 bg-slate-100 rounded-xl" />
-      <div className="h-20 bg-slate-100 rounded-xl" />
-      <div className="h-20 bg-slate-100 rounded-xl" />
-      <div className="h-4 bg-slate-100 rounded w-32 mt-4 mb-2" />
-      <div className="h-16 bg-slate-100 rounded-xl" />
+    <div className="flex flex-col items-center justify-center py-10 gap-6">
+      {/* Animated rings */}
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-full border-4 border-teal-100" />
+        <div
+          className="absolute inset-0 rounded-full border-4 border-transparent border-t-teal-500"
+          style={{ animation: 'spin 1s linear infinite' }}
+        />
+        <div className="absolute inset-2 rounded-full border-4 border-transparent border-t-teal-300"
+          style={{ animation: 'spin 1.5s linear infinite reverse' }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Cycling message */}
+      <div className="text-center">
+        <p
+          key={msgIndex}
+          className="text-sm font-medium text-slate-600"
+          style={{ animation: 'fadeIn 0.4s ease-in' }}
+        >
+          {LOADING_MESSAGES[msgIndex]}
+        </p>
+        <p className="text-xs text-slate-400 mt-1">This may take a few seconds</p>
+      </div>
+
+      {/* Skeleton cards */}
+      <div className="w-full flex flex-col gap-3 animate-pulse mt-2">
+        <div className="h-16 bg-slate-100 rounded-xl" />
+        <div className="h-16 bg-slate-100 rounded-xl" />
+        <div className="h-16 bg-slate-100 rounded-xl" />
+      </div>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }
