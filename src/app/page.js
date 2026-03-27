@@ -44,7 +44,7 @@ export default function Home() {
 
     // Step 3 — Fetch risk data from backend
     try {
-      const data = await getRiskData(coords.name, coords.lat, coords.lng);
+      const data = await getRiskData(coords.lat, coords.lng, coords.name);
       setRiskData(data);
     } catch (err) {
       setError('Could not load risk data for this location. Please try again.');
